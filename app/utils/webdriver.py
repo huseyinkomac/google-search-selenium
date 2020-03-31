@@ -1,4 +1,7 @@
 import os
+import time
+import random
+import socket
 
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
@@ -8,12 +11,14 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.common.exceptions import NoSuchElementException
 
 
 class SeleniumWebDriver:
-    def __init__(self, user_agent, logger):
+    def __init__(self, user_agent, logger, proxies=None):
         self.user_agent = user_agent
         self.logger = logger
+        self.proxies = proxies
 
     def create_webdriver(self, headless=True):
         if headless:
@@ -23,9 +28,19 @@ class SeleniumWebDriver:
             profile.set_preference("general.useragent.override", self.user_agent)
             profile.set_preference("dom.webnotifications.enabled", False)
 
+            if self.proxies:
+                ip = self.proxies['ip']
+                port = int(self.proxies['port'])
+                profile.set_preference("network.proxy.type", 1)
+                profile.set_preference("network.proxy.http", ip)
+                profile.set_preference("network.proxy.http_port", port)
+                profile.set_preference("network.proxy.ssl", ip)
+                profile.set_preference("network.proxy.ssl_port", port)
+
             profile.update_preferences()
-            
+
             self.driver = webdriver.Firefox(firefox_profile=profile)
+            socket.setdefaulttimeout(60)
             self.driver.set_window_size(1280, 1024)
             self.driver.delete_all_cookies()
         except Exception as e:
@@ -36,12 +51,21 @@ class SeleniumWebDriver:
 
     def click_element(self, elem):
         elem.click()
-        # find_method.click(elem)
-        # self.driver.find_ele
 
     def find_element(self, method, identifier):
         find_method = getattr(self.driver, method)
-        elem = find_method(identifier)
+        try:
+            elem = find_method(identifier)
+        except NoSuchElementException:
+            return None
+        return elem
+
+    def find_element_in_element(self, source_elem, method, identifier):
+        find_method = getattr(source_elem, method)
+        try:
+            elem = find_method(identifier)
+        except NoSuchElementException:
+            return None
         return elem
 
     def send_key(self, elem, key):

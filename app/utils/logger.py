@@ -10,7 +10,7 @@ class Logger:
             '%(asctime)s: %(pathname)s %(levelname)s %(funcName)s (%(lineno)d) -- %(message)s'
         )
 
-        fh = logging.FileHandler(f"../../logs/{fn}.log", mode='w')
+        fh = logging.FileHandler(f"../logs/{fn}.log")
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(formatter)
         logger.addHandler(fh)

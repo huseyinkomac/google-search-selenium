@@ -6,3 +6,10 @@ USER_AGENTS = [
 ]
 
 GOOGLE_BASE = "https://www.google.com/"
+
+GOOGLE_SEARCH_KEYWORDS = [
+    # 'evim depreme dayanıklı mı',
+    'uavt kodu nedir'
+]
+
+GOOGLE_SEARCH_MAIN_DOMAIN = 'http://depremonlemleri.com/'
